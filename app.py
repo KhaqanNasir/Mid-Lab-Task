@@ -34,7 +34,7 @@ def rank_candidates(cv_data):
         skills_score = cv_scores[0][0] * 100  # Convert to percentage
         experience_score = cv_scores[0][1] * 100  # Convert to percentage
 
-        total_score = (0.5 * skills_score + 0.5 * experience_score)  # Adjust weights as necessary
+        total_score = (0.3 * skills_score + 0.3 * experience_score)  # Adjust weights as necessary
         all_candidates.append((cv, total_score, skills_score, experience_score))
 
     return all_candidates
@@ -54,13 +54,20 @@ st.markdown("""
 st.title("🌟 CV Analysis and Candidate Ranking Tool 🌟")
 st.markdown("## Upload your CVs for analysis and receive scores based on skills and experience!")
 
+# Initialize session state for uploaded files if not already present
+if 'uploaded_files' not in st.session_state:
+    st.session_state.uploaded_files = []
+
 # Upload the CV PDF files
 uploaded_files = st.file_uploader("Choose PDF files", type="pdf", accept_multiple_files=True, help="Upload your CVs in PDF format")
 
 if uploaded_files:
+    # Store uploaded files in session state
+    st.session_state.uploaded_files = uploaded_files
+
     # Read and analyze the CVs
     with st.spinner("Extracting text from the CVs..."):
-        cvs = [extract_text_from_pdf(uploaded_file) for uploaded_file in uploaded_files]  # Extract text from all uploaded PDFs
+        cvs = [extract_text_from_pdf(uploaded_file) for uploaded_file in st.session_state.uploaded_files]  # Extract text from all uploaded PDFs
 
     # Rank candidates
     candidates = rank_candidates(cv_data=cvs)
@@ -109,9 +116,8 @@ if uploaded_files:
 
 # Clear button to reset uploaded CVs
 if st.button("Clear CVs"):
-    if 'uploaded_files' in st.session_state:
-        del st.session_state['uploaded_files']  # Clear the uploaded files if they exist
-    st.experimental_rerun()
+    st.session_state.uploaded_files = []  # Clear the uploaded files
+    st.experimental_rerun()  # Rerun the app to refresh the UI
 
 # Footer
 st.markdown("""
