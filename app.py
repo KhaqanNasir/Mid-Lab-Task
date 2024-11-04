@@ -30,17 +30,24 @@ def analyze_cv_text(cv_text):
 def rank_candidates(cv_data):
     all_candidates = []
     for cv in cv_data:
-        cv_scores = analyze_cv_text(cv)  # Get scores for each CV
-        skills_score = cv_scores[0][0] * 100  # Convert to percentage
-        experience_score = cv_scores[0][1] * 100  # Convert to percentage
-
-        total_score = (0.3 * skills_score + 0.3 * experience_score)  # Adjust weights as necessary
+        cv_scores = analyze_cv_text(cv)
+        skills_score = cv_scores[0][0] * 100
+        experience_score = cv_scores[0][1] * 100
+        total_score = (0.3 * skills_score + 0.3 * experience_score)
         all_candidates.append((cv, total_score, skills_score, experience_score))
-
     return all_candidates
 
+# Function to reset the session state
+def reset_state():
+    if "uploaded_files" in st.session_state:
+        del st.session_state["uploaded_files"]
+    if "candidates" in st.session_state:
+        del st.session_state["candidates"]
+    st.session_state["uploaded_files"] = None
+    st.session_state["candidates"] = []
+
 # Streamlit UI
-st.set_page_config(page_title="CV Analysis Tool", layout="wide")  # Set page title and layout
+st.set_page_config(page_title="CV Analysis Tool", layout="wide")
 st.markdown("""
     <h2 style='text-align: center; color: white;'>Developed by <i>Muhammad Khaqan Nasir</i></h2>
     <p style='text-align: center; color: navy;'>
@@ -48,29 +55,30 @@ st.markdown("""
             <img src='https://cdn-icons-png.flaticon.com/512/174/174857.png' alt='ImageNotFound' width='20' style='vertical-align: middle; margin-right: 8px;'/>
             LinkedIn
         </a>
-    </p> <br><br>
+    </p><br><br>
     """, unsafe_allow_html=True)
 
 st.title("🌟 CV Analysis and Candidate Ranking Tool 🌟")
 st.markdown("## Upload your CVs for analysis and receive scores based on skills and experience!")
 
+# Check if session state has 'uploaded_files'
+if "uploaded_files" not in st.session_state:
+    st.session_state["uploaded_files"] = None
+
 # Upload the CV PDF files
 uploaded_files = st.file_uploader("Choose PDF files", type="pdf", accept_multiple_files=True, help="Upload your CVs in PDF format")
 
 if uploaded_files:
-    # Read and analyze the CVs
+    st.session_state["uploaded_files"] = uploaded_files
     with st.spinner("Extracting text from the CVs..."):
-        cvs = [extract_text_from_pdf(uploaded_file) for uploaded_file in uploaded_files]  # Extract text from all uploaded PDFs
-
-    # Rank candidates
+        cvs = [extract_text_from_pdf(uploaded_file) for uploaded_file in uploaded_files]
     candidates = rank_candidates(cv_data=cvs)
 
-    # Display candidates
     if candidates:
         st.subheader("Candidates Analysis")
         for index, candidate in enumerate(candidates):
             cv, total_score, skills_score, experience_score = candidate
-            st.write(f"**CV Snippet {index + 1}:** {cv[:30]}...")  # Print a snippet of the CV text
+            st.write(f"**CV Snippet {index + 1}:** {cv[:30]}...")
             st.write(f"**Total Score:** {total_score:.2f}%")
             st.write(f"**Skills Score:** {skills_score:.2f}%")
             st.write(f"**Experience Score:** {experience_score:.2f}%")
@@ -97,7 +105,6 @@ if uploaded_files:
 
         st.pyplot(fig)
 
-        # Determine the best candidate
         best_candidate = max(candidates, key=lambda x: x[1])
         best_cv, best_total_score, best_skills_score, best_experience_score = best_candidate
         st.markdown(f"### **Best Candidate:** CV Snippet: {best_cv[:30]}...")
@@ -109,18 +116,11 @@ if uploaded_files:
 
 # Clear button to reset uploaded CVs
 if st.button("Clear CVs"):
-    if uploaded_files:
-        # Check if the session state key exists before deleting
-        if "file_uploader" in st.session_state:
-            del st.session_state["file_uploader"]
-        # Reset other relevant session state variables if necessary
-        if "candidates" in st.session_state:
-            del st.session_state["candidates"]
-        # Simply set uploaded_files to None or an empty list
-        uploaded_files = None  # Reset the uploaded files variable
-        st.success("CVs cleared successfully!")  # Optional success message
+    if st.session_state.get("uploaded_files") or st.session_state.get("candidates"):
+        reset_state()
+        st.success("CVs cleared successfully!")
     else:
-        st.warning("No files to clear. Please upload a CV first.")
+        st.warning("No CVs uploaded to clear.")
 
 
 # Footer
