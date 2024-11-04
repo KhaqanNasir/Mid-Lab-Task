@@ -48,26 +48,18 @@ st.markdown("""
             <img src='https://cdn-icons-png.flaticon.com/512/174/174857.png' alt='ImageNotFound' width='20' style='vertical-align: middle; margin-right: 8px;'/>
             LinkedIn
         </a>
-    </p><br><br>
+    </p> <br><br>
     """, unsafe_allow_html=True)
-
 st.title("🌟 CV Analysis and Candidate Ranking Tool 🌟")
 st.markdown("## Upload your CVs for analysis and receive scores based on skills and experience!")
-
-# Initialize session state for uploaded files if not already present
-if 'uploaded_files' not in st.session_state:
-    st.session_state.uploaded_files = []
 
 # Upload the CV PDF files
 uploaded_files = st.file_uploader("Choose PDF files", type="pdf", accept_multiple_files=True, help="Upload your CVs in PDF format")
 
 if uploaded_files:
-    # Store uploaded files in session state
-    st.session_state.uploaded_files = uploaded_files
-
     # Read and analyze the CVs
-    with st.spinner("Extracting text from the CVs..."):
-        cvs = [extract_text_from_pdf(uploaded_file) for uploaded_file in st.session_state.uploaded_files]  # Extract text from all uploaded PDFs
+    st.spinner("Extracting text from the CVs...")
+    cvs = [extract_text_from_pdf(uploaded_file) for uploaded_file in uploaded_files]  # Extract text from all uploaded PDFs
 
     # Rank candidates
     candidates = rank_candidates(cv_data=cvs)
@@ -116,10 +108,12 @@ if uploaded_files:
 
 # Clear button to reset uploaded CVs
 if st.button("Clear CVs"):
-    # Only attempt to clear if the key exists
-    if 'uploaded_files' in st.session_state:
-        st.session_state.uploaded_files = []  # Clear the uploaded files
-    st.experimental_rerun()  # Rerun the app to refresh the UI
+    if uploaded_files:
+        # Clear uploaded files by resetting session state
+        del st.session_state["file_uploader"]
+        st.experimental_rerun()
+    else:
+        st.warning("No files to clear. Please upload a CV first.")
 
 # Footer
 st.markdown("""
