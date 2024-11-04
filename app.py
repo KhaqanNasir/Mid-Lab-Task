@@ -41,12 +41,14 @@ def rank_candidates(cv_data):
 
 # Streamlit UI
 st.title("CV Analysis and Candidate Ranking")
+st.markdown("## Upload your CV for analysis and receive a score based on skills and experience!")
 
 # Upload the CV PDF file
-uploaded_file = st.file_uploader("Upload CV PDF", type="pdf")
+uploaded_file = st.file_uploader("Choose a PDF file", type="pdf", help="Upload your CV in PDF format")
 
 if uploaded_file:
     # Read and analyze the CV
+    st.spinner("Extracting text from the CV...")
     cv_text = extract_text_from_pdf(uploaded_file)  # Extract text from the PDF CV
     cvs = [cv_text]  # List of CV texts for analysis
 
@@ -58,10 +60,10 @@ if uploaded_file:
         st.subheader("Candidates Analysis")
         for candidate in candidates:
             cv, total_score, skills_score, experience_score = candidate
-            st.write(f"\nCV Snippet: {cv[:30]}...")  # Print a snippet of the CV text
-            st.write(f"Total Score: {total_score:.2f}%")
-            st.write(f"Skills Score: {skills_score:.2f}%")
-            st.write(f"Experience Score: {experience_score:.2f}%")
+            st.write(f"**CV Snippet:** {cv[:30]}...")  # Print a snippet of the CV text
+            st.write(f"**Total Score:** {total_score:.2f}%")
+            st.write(f"**Skills Score:** {skills_score:.2f}%")
+            st.write(f"**Experience Score:** {experience_score:.2f}%")
 
         # Plotting the skills and experience scores
         st.subheader("Skills and Experience Scores")
@@ -76,5 +78,19 @@ if uploaded_file:
         
         st.pyplot(fig)  # Display the plot in Streamlit
 
+        # Additional information
+        st.markdown("""
+        ### Analysis Insights:
+        - A higher Skills Score indicates better qualifications related to the job.
+        - A higher Experience Score reflects more relevant work history.
+        - Scores below 30% indicate that further improvement in skills or experience may be necessary.
+        """)
+
     else:
-        st.write("No candidates found.")
+        st.warning("No candidates found. Please check the CV content.")
+
+# Footer
+st.markdown("""
+---
+*This CV analysis tool helps you evaluate your qualifications based on your CV. Ensure your CV is well-formatted and clear for the best results!*
+""")
