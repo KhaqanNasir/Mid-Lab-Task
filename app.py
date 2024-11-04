@@ -41,8 +41,17 @@ def rank_candidates(cv_data):
 
 # Streamlit UI
 st.set_page_config(page_title="CV Analysis Tool", layout="wide")  # Set page title and layout
-st.markdown("<h1 style='text-align: center; color: navy;'>Developed by</h1>", unsafe_allow_html=True)
-st.markdown("<p style='text-align: center;'><a href='https://www.linkedin.com/in/muhammad-khaqan-nasir' target='_blank'>Connect on LinkedIn</a></p>", unsafe_allow_html=True)
+# st.markdown("<h1 style='text-align: center; color: navy;'>Developed by Muhammad Khaqan Nasir</h1>", unsafe_allow_html=True)
+# st.markdown("<p style='text-align: center;'><a href='https://www.linkedin.com/in/khaqan-nasir/' target='_blank'>Connect on LinkedIn</a></p>", unsafe_allow_html=True)
+st.markdown("""
+    <h1 style='text-align: center; color: navy;'>Developed by Muhammad Khaqan Nasir</h1>
+    <p style='text-align: center;'>
+        <a href='https://www.linkedin.com/in/khaqan-nasir/' target='_blank'>
+            <img src='https://cdn-icons-png.flaticon.com/512/174/174857.png' alt='LinkedIn' width='24' style='vertical-align: middle; margin-right: 8px;'/>
+            Connect on LinkedIn
+        </a>
+    </p>
+    """, unsafe_allow_html=True)
 st.title("🌟 CV Analysis and Candidate Ranking Tool 🌟")
 st.markdown("## Upload your CVs for analysis and receive scores based on skills and experience!")
 
