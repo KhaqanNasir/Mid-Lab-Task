@@ -1,0 +1,5 @@
+transformers 
+pdfminer.six
+pdfplumber
+streamlit
+
