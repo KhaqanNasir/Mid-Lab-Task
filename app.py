@@ -33,7 +33,7 @@ def rank_candidates(cv_data):
         cv_scores = analyze_cv_text(cv)
         skills_score = cv_scores[0][0] * 100
         experience_score = cv_scores[0][1] * 100
-        total_score = (0.3 * skills_score + 0.3 * experience_score)
+        total_score = (0.5 * skills_score + 0.5 * experience_score)
         all_candidates.append((cv, total_score, skills_score, experience_score))
     return all_candidates
 
