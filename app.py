@@ -42,7 +42,7 @@ def rank_candidates(cv_data):
 # Streamlit UI
 st.set_page_config(page_title="CV Analysis Tool", layout="wide")  # Set page title and layout
 st.markdown("""
-    <h2 style='text-align: center; color: white;'>Developed by Muhammad Khaqan Nasir</h2>
+    <h2 style='text-align: center; color: white;'>Developed by <i>Muhammad Khaqan Nasir</i></h2>
     <p style='text-align: center; color: navy;'>
         <a href='https://www.linkedin.com/in/khaqan-nasir/' target='_blank'>
             <img src='https://cdn-icons-png.flaticon.com/512/174/174857.png' alt='LinkedIn' width='20' style='vertical-align: middle; margin-right: 8px;'/>
