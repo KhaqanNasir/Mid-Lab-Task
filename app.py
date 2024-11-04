@@ -40,7 +40,8 @@ def rank_candidates(cv_data):
     return all_candidates
 
 # Streamlit UI
-st.title("CV Analysis and Candidate Ranking")
+st.set_page_config(page_title="CV Analysis Tool", layout="wide")  # Set page title and layout
+st.title("🌟 CV Analysis and Candidate Ranking Tool 🌟")
 st.markdown("## Upload your CVs for analysis and receive scores based on skills and experience!")
 
 # Upload the CV PDF files
@@ -96,6 +97,11 @@ if uploaded_files:
 
     else:
         st.warning("No candidates found. Please check the CV content.")
+
+# Clear button to reset uploaded CVs
+if st.button("Clear CVs"):
+    st.session_state.uploaded_files = []  # Clear the uploaded files
+    st.experimental_rerun()  # Refresh the app
 
 # Footer
 st.markdown("""
