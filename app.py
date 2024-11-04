@@ -41,16 +41,15 @@ def rank_candidates(cv_data):
 
 # Streamlit UI
 st.title("CV Analysis and Candidate Ranking")
-st.markdown("## Upload your CV for analysis and receive a score based on skills and experience!")
+st.markdown("## Upload your CVs for analysis and receive scores based on skills and experience!")
 
-# Upload the CV PDF file
-uploaded_file = st.file_uploader("Choose a PDF file", type="pdf", help="Upload your CV in PDF format")
+# Upload the CV PDF files
+uploaded_files = st.file_uploader("Choose PDF files", type="pdf", accept_multiple_files=True, help="Upload your CVs in PDF format")
 
-if uploaded_file:
-    # Read and analyze the CV
-    st.spinner("Extracting text from the CV...")
-    cv_text = extract_text_from_pdf(uploaded_file)  # Extract text from the PDF CV
-    cvs = [cv_text]  # List of CV texts for analysis
+if uploaded_files:
+    # Read and analyze the CVs
+    st.spinner("Extracting text from the CVs...")
+    cvs = [extract_text_from_pdf(uploaded_file) for uploaded_file in uploaded_files]  # Extract text from all uploaded PDFs
 
     # Rank candidates
     candidates = rank_candidates(cv_data=cvs)
@@ -58,33 +57,42 @@ if uploaded_file:
     # Display candidates
     if candidates:
         st.subheader("Candidates Analysis")
-        for candidate in candidates:
+        for index, candidate in enumerate(candidates):
             cv, total_score, skills_score, experience_score = candidate
-            st.write(f"**CV Snippet:** {cv[:30]}...")  # Print a snippet of the CV text
+            st.write(f"**CV Snippet {index + 1}:** {cv[:30]}...")  # Print a snippet of the CV text
             st.write(f"**Total Score:** {total_score:.2f}%")
             st.write(f"**Skills Score:** {skills_score:.2f}%")
             st.write(f"**Experience Score:** {experience_score:.2f}%")
 
-        # Plotting the skills and experience scores
-        st.subheader("Skills and Experience Scores")
-        labels = ['Skills Score', 'Experience Score']
-        scores = [candidates[0][2], candidates[0][3]]  # Get scores from the first candidate
+        # Plotting the scores for each CV
+        st.subheader("Comparison of Skills and Experience Scores")
+        
+        labels = [f"CV {i + 1}" for i in range(len(candidates))]
+        skills_scores = [candidate[2] for candidate in candidates]
+        experience_scores = [candidate[3] for candidate in candidates]
+
+        x = range(len(candidates))  # X-axis for bar placement
 
         fig, ax = plt.subplots()
-        ax.bar(labels, scores, color=['blue', 'orange'])
+        ax.bar(x, skills_scores, width=0.4, label='Skills Score', color='blue', align='center')
+        ax.bar([p + 0.4 for p in x], experience_scores, width=0.4, label='Experience Score', color='orange', align='center')
+
         ax.set_ylim(0, 100)
+        ax.set_xticks([p + 0.2 for p in x])
+        ax.set_xticklabels(labels)
         ax.set_ylabel("Percentile (%)")
-        ax.set_title("Candidate Skills and Experience Scores")
-        
+        ax.set_title("Comparison of Candidate Skills and Experience Scores")
+        ax.legend()
+
         st.pyplot(fig)  # Display the plot in Streamlit
 
-        # Additional information
-        st.markdown("""
-        ### Analysis Insights:
-        - A higher Skills Score indicates better qualifications related to the job.
-        - A higher Experience Score reflects more relevant work history.
-        - Scores below 30% indicate that further improvement in skills or experience may be necessary.
-        """)
+        # Determine the best candidate
+        best_candidate = max(candidates, key=lambda x: x[1])  # Get the candidate with the highest total score
+        best_cv, best_total_score, best_skills_score, best_experience_score = best_candidate
+        st.markdown(f"### Best Candidate: CV Snippet: {best_cv[:30]}...")
+        st.write(f"**Best Total Score:** {best_total_score:.2f}%")
+        st.write(f"**Best Skills Score:** {best_skills_score:.2f}%")
+        st.write(f"**Best Experience Score:** {best_experience_score:.2f}%")
 
     else:
         st.warning("No candidates found. Please check the CV content.")
