@@ -48,7 +48,7 @@ st.markdown("""
             <img src='https://cdn-icons-png.flaticon.com/512/174/174857.png' alt='ImageNotFound' width='20' style='vertical-align: middle; margin-right: 8px;'/>
             LinkedIn
         </a>
-    </p> <br>
+    </p> <br><br>
     """, unsafe_allow_html=True)
 st.title("🌟 CV Analysis and Candidate Ranking Tool 🌟")
 st.markdown("## Upload your CVs for analysis and receive scores based on skills and experience!")
