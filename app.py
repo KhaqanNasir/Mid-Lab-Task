@@ -116,7 +116,9 @@ if uploaded_files:
 
 # Clear button to reset uploaded CVs
 if st.button("Clear CVs"):
-    st.session_state.uploaded_files = []  # Clear the uploaded files
+    # Only attempt to clear if the key exists
+    if 'uploaded_files' in st.session_state:
+        st.session_state.uploaded_files = []  # Clear the uploaded files
     st.experimental_rerun()  # Rerun the app to refresh the UI
 
 # Footer
