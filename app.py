@@ -30,81 +30,84 @@ def analyze_cv_text(cv_text):
 def rank_candidates(cv_data):
     all_candidates = []
     for cv in cv_data:
-        cv_scores = analyze_cv_text(cv)  # Get scores for each CV
-        skills_score = cv_scores[0][0] * 100  # Convert to percentage
-        experience_score = cv_scores[0][1] * 100  # Convert to percentage
-
-        total_score = (0.3 * skills_score + 0.3 * experience_score)  # Adjust weights as necessary
+        cv_scores = analyze_cv_text(cv)
+        skills_score = cv_scores[0][0] * 100
+        experience_score = cv_scores[0][1] * 100
+        total_score = (0.5 * skills_score + 0.5 * experience_score)
         all_candidates.append((cv, total_score, skills_score, experience_score))
-
     return all_candidates
 
 # Streamlit UI
-st.set_page_config(page_title="CV Analysis Tool", layout="wide")  # Set page title and layout
-st.title("🌟 CV Analysis and Candidate Ranking Tool 🌟")
-st.markdown("## Upload your CVs for analysis and receive scores based on skills and experience!")
+st.set_page_config(page_title="Professional CV Analysis Tool", layout="wide")
+st.title("🔍 Professional CV Analysis and Candidate Ranking Tool")
+st.markdown("<h2 style='color: #2c3e50;'>Upload CVs to analyze skills and experience</h2>", unsafe_allow_html=True)
+st.markdown("---")
 
 # Upload the CV PDF files
-uploaded_files = st.file_uploader("Choose PDF files", type="pdf", accept_multiple_files=True, help="Upload your CVs in PDF format")
+uploaded_files = st.file_uploader("Choose PDF files", type="pdf", accept_multiple_files=True, help="Upload CVs in PDF format")
+
+# Clear button to reset uploaded CVs
+if st.button("Clear CVs"):
+    uploaded_files = None  # Reset the uploaded files
+    st.experimental_rerun()
 
 if uploaded_files:
-    # Read and analyze the CVs
-    st.spinner("Extracting text from the CVs...")
-    cvs = [extract_text_from_pdf(uploaded_file) for uploaded_file in uploaded_files]  # Extract text from all uploaded PDFs
-
+    st.spinner("Extracting text and analyzing CVs...")
+    cvs = [extract_text_from_pdf(uploaded_file) for uploaded_file in uploaded_files]
+    
     # Rank candidates
     candidates = rank_candidates(cv_data=cvs)
 
     # Display candidates
     if candidates:
-        st.subheader("Candidates Analysis")
+        st.markdown("<h3 style='color: #16a085;'>Candidates Analysis</h3>", unsafe_allow_html=True)
         for index, candidate in enumerate(candidates):
             cv, total_score, skills_score, experience_score = candidate
-            st.write(f"**CV Snippet {index + 1}:** {cv[:30]}...")  # Print a snippet of the CV text
-            st.write(f"**Total Score:** {total_score:.2f}%")
-            st.write(f"**Skills Score:** {skills_score:.2f}%")
-            st.write(f"**Experience Score:** {experience_score:.2f}%")
+            st.write(f"<b>CV Snippet {index + 1}</b>: {cv[:30]}...", unsafe_allow_html=True)
+            st.markdown(f"<span style='color: #2980b9;'>Total Score:</span> {total_score:.2f}%", unsafe_allow_html=True)
+            st.markdown(f"<span style='color: #27ae60;'>Skills Score:</span> {skills_score:.2f}%", unsafe_allow_html=True)
+            st.markdown(f"<span style='color: #e74c3c;'>Experience Score:</span> {experience_score:.2f}%", unsafe_allow_html=True)
 
         # Plotting the scores for each CV
-        st.subheader("Comparison of Skills and Experience Scores")
-        
+        st.markdown("<h3 style='color: #34495e;'>Comparison of Skills and Experience Scores</h3>", unsafe_allow_html=True)
+
         labels = [f"CV {i + 1}" for i in range(len(candidates))]
         skills_scores = [candidate[2] for candidate in candidates]
         experience_scores = [candidate[3] for candidate in candidates]
 
-        x = range(len(candidates))  # X-axis for bar placement
+        x = range(len(candidates))
 
-        fig, ax = plt.subplots()
-        ax.bar(x, skills_scores, width=0.4, label='Skills Score', color='blue', align='center')
-        ax.bar([p + 0.4 for p in x], experience_scores, width=0.4, label='Experience Score', color='orange', align='center')
+        # Styling the graph with professional colors
+        fig, ax = plt.subplots(figsize=(10, 6))
+        ax.bar(x, skills_scores, width=0.4, label='Skills Score', color='#3498db', align='center')
+        ax.bar([p + 0.4 for p in x], experience_scores, width=0.4, label='Experience Score', color='#e67e22', align='center')
 
         ax.set_ylim(0, 100)
         ax.set_xticks([p + 0.2 for p in x])
         ax.set_xticklabels(labels)
-        ax.set_ylabel("Percentile (%)")
-        ax.set_title("Comparison of Candidate Skills and Experience Scores")
-        ax.legend()
+        ax.set_ylabel("Percentile (%)", fontsize=12)
+        ax.set_title("Candidate Skills and Experience Score Comparison", fontsize=14, fontweight='bold')
+        ax.legend(fontsize=12)
+        ax.grid(axis='y', linestyle='--', alpha=0.7)
 
-        st.pyplot(fig)  # Display the plot in Streamlit
+        st.pyplot(fig)
 
         # Determine the best candidate
-        best_candidate = max(candidates, key=lambda x: x[1])  # Get the candidate with the highest total score
+        best_candidate = max(candidates, key=lambda x: x[1])
         best_cv, best_total_score, best_skills_score, best_experience_score = best_candidate
-        st.markdown(f"### Best Candidate: CV Snippet: {best_cv[:30]}...")
-        st.write(f"**Best Total Score:** {best_total_score:.2f}%")
-        st.write(f"**Best Skills Score:** {best_skills_score:.2f}%")
-        st.write(f"**Best Experience Score:** {best_experience_score:.2f}%")
-
+        st.markdown(f"<h3 style='color: #8e44ad;'>Best Candidate:</h3> <b>CV Snippet:</b> {best_cv[:30]}...", unsafe_allow_html=True)
+        st.markdown(f"<span style='color: #2ecc71;'>Best Total Score:</span> {best_total_score:.2f}%", unsafe_allow_html=True)
+        st.markdown(f"<span style='color: #3498db;'>Best Skills Score:</span> {best_skills_score:.2f}%", unsafe_allow_html=True)
+        st.markdown(f"<span style='color: #e74c3c;'>Best Experience Score:</span> {best_experience_score:.2f}%", unsafe_allow_html=True)
     else:
-        st.warning("No candidates found. Please check the CV content.")
-
-# Clear button to reset uploaded CVs
-if st.button("Clear CVs"):
-    st.session_state.uploaded_files = []  # Clear the uploaded files
-    st.experimental_rerun()  # Refresh the app
+        st.warning("No valid candidates found. Please check the CV content.")
+else:
+    st.info("Upload one or more PDF CVs to begin the analysis.")
 
 # Footer
 st.markdown("""
----
-*This CV analysis tool helps you evaluate your qualifications based on your CV. Ensure your CV is well-formatted and clear for the best results!*
-""")
+<hr>
+<p style="text-align: center; color: gray;">
+*This tool is designed for professional CV analysis and candidate ranking. Please ensure your CVs are clear and well-formatted for accurate results.*
+</p>
+""", unsafe_allow_html=True)
