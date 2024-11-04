@@ -50,6 +50,7 @@ st.markdown("""
         </a>
     </p> <br><br>
     """, unsafe_allow_html=True)
+
 st.title("🌟 CV Analysis and Candidate Ranking Tool 🌟")
 st.markdown("## Upload your CVs for analysis and receive scores based on skills and experience!")
 
@@ -58,8 +59,8 @@ uploaded_files = st.file_uploader("Choose PDF files", type="pdf", accept_multipl
 
 if uploaded_files:
     # Read and analyze the CVs
-    st.spinner("Extracting text from the CVs...")
-    cvs = [extract_text_from_pdf(uploaded_file) for uploaded_file in uploaded_files]  # Extract text from all uploaded PDFs
+    with st.spinner("Extracting text from the CVs..."):
+        cvs = [extract_text_from_pdf(uploaded_file) for uploaded_file in uploaded_files]  # Extract text from all uploaded PDFs
 
     # Rank candidates
     candidates = rank_candidates(cv_data=cvs)
@@ -99,7 +100,7 @@ if uploaded_files:
         # Determine the best candidate
         best_candidate = max(candidates, key=lambda x: x[1])
         best_cv, best_total_score, best_skills_score, best_experience_score = best_candidate
-        st.markdown(f"### Best Candidate: CV Snippet: {best_cv[:30]}...")
+        st.markdown(f"### **Best Candidate:** CV Snippet: {best_cv[:30]}...")
         st.write(f"**Best Total Score:** {best_total_score:.2f}%")
         st.write(f"**Best Skills Score:** {best_skills_score:.2f}%")
         st.write(f"**Best Experience Score:** {best_experience_score:.2f}%")
