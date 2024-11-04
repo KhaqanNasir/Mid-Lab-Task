@@ -108,9 +108,12 @@ if uploaded_files:
 
 # Clear button to reset uploaded CVs
 if st.button("Clear CVs"):
-    if 'uploaded_files' in st.session_state:
-        del st.session_state.uploaded_files  # Clear the uploaded files
-    st.experimental_rerun()
+    if uploaded_files:
+        # Clear uploaded files by resetting session state
+        del st.session_state["file_uploader"]
+        st.experimental_rerun()
+    else:
+        st.warning("No files to clear. Please upload a CV first.")
 
 # Footer
 st.markdown("""
