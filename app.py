@@ -46,8 +46,8 @@ st.markdown("---")
 # Upload the CV PDF files
 uploaded_files = st.file_uploader("Choose PDF files", type="pdf", accept_multiple_files=True, help="Upload CVs in PDF format")
 
-# Clear button to reset uploaded CVs
-if st.button("Clear CVs"):
+# Clear button to reset uploaded CVs only if files are uploaded
+if st.button("Clear CVs") and uploaded_files:
     uploaded_files = None  # Reset the uploaded files
     st.experimental_rerun()
 
