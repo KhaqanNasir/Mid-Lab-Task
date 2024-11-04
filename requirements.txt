@@ -1,5 +1,4 @@
-transformers 
-pdfminer.six
-pdfplumber
 streamlit
-
+pdfplumber
+torch
+transformers
