@@ -113,9 +113,15 @@ if st.button("Clear CVs"):
         # Check if the session state key exists before deleting
         if "file_uploader" in st.session_state:
             del st.session_state["file_uploader"]
-        st.experimental_rerun()
+        # Reset other relevant session state variables if necessary
+        if "candidates" in st.session_state:
+            del st.session_state["candidates"]
+        # Simply set uploaded_files to None or an empty list
+        uploaded_files = None  # Reset the uploaded files variable
+        st.success("CVs cleared successfully!")  # Optional success message
     else:
         st.warning("No files to clear. Please upload a CV first.")
+
 
 # Footer
 st.markdown("""
