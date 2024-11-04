@@ -74,46 +74,44 @@ if uploaded_files:
         cvs = [extract_text_from_pdf(uploaded_file) for uploaded_file in uploaded_files]
     candidates = rank_candidates(cv_data=cvs)
 
-   if candidates:
-    st.subheader("Candidates Analysis")
-    for index, candidate in enumerate(candidates):
-        cv, total_score, skills_score, experience_score = candidate
-        
-        # Create colored sections for better distinction
-        total_color = 'color: #2ca02c;'  # Green for total score
-        skills_color = 'color: #1f77b4;'  # Blue for skills score
-        experience_color = 'color: #ff7f0e;'  # Orange for experience score
-        
-        st.markdown(f"**CV Snippet {index + 1}:** <span style='color: #d62728;'>{cv[:30]}...</span>", unsafe_allow_html=True)
-        st.markdown(f"**Total Score:** <span style='{total_color}'>{total_score:.2f}%</span>", unsafe_allow_html=True)
-        st.markdown(f"**Skills Score:** <span style='{skills_color}'>{skills_score:.2f}%</span>", unsafe_allow_html=True)
-        st.markdown(f"**Experience Score:** <span style='{experience_color}'>{experience_score:.2f}%</span>", unsafe_allow_html=True)
+    if candidates:  # Ensure proper indentation here
+        st.subheader("Candidates Analysis")
+        for index, candidate in enumerate(candidates):
+            cv, total_score, skills_score, experience_score = candidate
+            
+            # Create colored sections for better distinction
+            total_color = 'color: #2ca02c;'  # Green for total score
+            skills_color = 'color: #1f77b4;'  # Blue for skills score
+            experience_color = 'color: #ff7f0e;'  # Orange for experience score
+            
+            st.markdown(f"**CV Snippet {index + 1}:** <span style='color: #d62728;'>{cv[:30]}...</span>", unsafe_allow_html=True)
+            st.markdown(f"**Total Score:** <span style='{total_color}'>{total_score:.2f}%</span>", unsafe_allow_html=True)
+            st.markdown(f"**Skills Score:** <span style='{skills_color}'>{skills_score:.2f}%</span>", unsafe_allow_html=True)
+            st.markdown(f"**Experience Score:** <span style='{experience_color}'>{experience_score:.2f}%</span>", unsafe_allow_html=True)
 
+        # Plotting the scores for each CV
+        st.subheader("Comparison of Skills and Experience Scores")
 
-       # Plotting the scores for each CV
-st.subheader("Comparison of Skills and Experience Scores")
+        labels = [f"CV {i + 1}" for i in range(len(candidates))]
+        skills_scores = [candidate[2] for candidate in candidates]
+        experience_scores = [candidate[3] for candidate in candidates]
 
-labels = [f"CV {i + 1}" for i in range(len(candidates))]
-skills_scores = [candidate[2] for candidate in candidates]
-experience_scores = [candidate[3] for candidate in candidates]
+        x = range(len(candidates))
 
-x = range(len(candidates))
+        # Create a smaller width for the figure
+        fig, ax = plt.subplots(figsize=(6, 4))  # Adjust the size here
 
-# Create a smaller width for the figure
-fig, ax = plt.subplots(figsize=(6, 4))  # Adjust the size here
+        ax.bar(x, skills_scores, width=0.4, label='Skills Score', color='#1f77b4', align='center')
+        ax.bar([p + 0.4 for p in x], experience_scores, width=0.4, label='Experience Score', color='#ff7f0e', align='center')
 
-ax.bar(x, skills_scores, width=0.4, label='Skills Score', color='#1f77b4', align='center')
-ax.bar([p + 0.4 for p in x], experience_scores, width=0.4, label='Experience Score', color='#ff7f0e', align='center')
+        ax.set_ylim(0, 100)
+        ax.set_xticks([p + 0.2 for p in x])
+        ax.set_xticklabels(labels)
+        ax.set_ylabel("Percentile (%)")
+        ax.set_title("Comparison of Candidate Skills and Experience Scores")
+        ax.legend()
 
-ax.set_ylim(0, 100)
-ax.set_xticks([p + 0.2 for p in x])
-ax.set_xticklabels(labels)
-ax.set_ylabel("Percentile (%)")
-ax.set_title("Comparison of Candidate Skills and Experience Scores")
-ax.legend()
-
-st.pyplot(fig)
-
+        st.pyplot(fig)
 
         best_candidate = max(candidates, key=lambda x: x[1])
         best_cv, best_total_score, best_skills_score, best_experience_score = best_candidate
