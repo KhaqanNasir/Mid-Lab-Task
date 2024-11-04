@@ -4,6 +4,10 @@ from transformers import DistilBertTokenizer, DistilBertForSequenceClassificatio
 import streamlit as st
 import matplotlib.pyplot as plt
 
+# Initialize session state for uploaded files
+if 'uploaded_files' not in st.session_state:
+    st.session_state.uploaded_files = None
+
 # Load the pretrained model and tokenizer
 model_name = "distilbert-base-uncased"
 tokenizer = DistilBertTokenizer.from_pretrained(model_name)
@@ -44,16 +48,18 @@ st.markdown("<h2 style='color: #2c3e50;'>Upload CVs to analyze skills and experi
 st.markdown("---")
 
 # Upload the CV PDF files
-uploaded_files = st.file_uploader("Choose PDF files", type="pdf", accept_multiple_files=True, help="Upload CVs in PDF format")
+if st.session_state.uploaded_files is None:
+    uploaded_files = st.file_uploader("Choose PDF files", type="pdf", accept_multiple_files=True, help="Upload CVs in PDF format")
+    st.session_state.uploaded_files = uploaded_files
 
-# Clear button to reset uploaded CVs only if files are uploaded
-if st.button("Clear CVs") and uploaded_files:
-    uploaded_files = None  # Reset the uploaded files
-    st.experimental_rerun()
+# Clear button to reset uploaded CVs
+if st.button("Clear CVs"):
+    st.session_state.uploaded_files = None
 
-if uploaded_files:
+# Processing the uploaded files
+if st.session_state.uploaded_files:
     st.spinner("Extracting text and analyzing CVs...")
-    cvs = [extract_text_from_pdf(uploaded_file) for uploaded_file in uploaded_files]
+    cvs = [extract_text_from_pdf(uploaded_file) for uploaded_file in st.session_state.uploaded_files]
     
     # Rank candidates
     candidates = rank_candidates(cv_data=cvs)
