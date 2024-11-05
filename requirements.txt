@@ -3,3 +3,4 @@ pdfplumber
 torch
 transformers
 matplotlib
+docx2txt
