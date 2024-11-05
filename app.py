@@ -3,6 +3,7 @@ import torch
 from transformers import DistilBertTokenizer, DistilBertForSequenceClassification
 import streamlit as st
 import matplotlib.pyplot as plt
+import docx2txt  # For extracting text from Word documents
 
 # Load the pretrained model and tokenizer
 model_name = "distilbert-base-uncased"
@@ -16,6 +17,10 @@ def extract_text_from_pdf(pdf_path):
         for page in pdf.pages:
             text += page.extract_text() + "\n"
     return text.strip()
+
+# Function to extract text from a Word CV
+def extract_text_from_word(docx_path):
+    return docx2txt.process(docx_path)
 
 # Function to analyze the CV text and return scores
 def analyze_cv_text(cv_text):
@@ -65,16 +70,27 @@ st.markdown("## Upload your CVs for analysis and receive scores based on skills 
 if "uploaded_files" not in st.session_state:
     st.session_state["uploaded_files"] = None
 
-# Upload the CV PDF files
-uploaded_files = st.file_uploader("Choose PDF files", type="pdf", accept_multiple_files=True, help="Upload your CVs in PDF format")
+# Upload the CV files (accepts both PDF and Word documents)
+uploaded_files = st.file_uploader(
+    "Choose CV files", type=["pdf", "docx"], accept_multiple_files=True, help="Upload your CVs in PDF or DOCX format"
+)
 
 if uploaded_files:
     st.session_state["uploaded_files"] = uploaded_files
+    cvs = []
+
+    # Extract text from each uploaded file based on file type
     with st.spinner("Extracting text from the CVs..."):
-        cvs = [extract_text_from_pdf(uploaded_file) for uploaded_file in uploaded_files]
+        for uploaded_file in uploaded_files:
+            if uploaded_file.type == "application/pdf":
+                cvs.append(extract_text_from_pdf(uploaded_file))
+            elif uploaded_file.type == "application/vnd.openxmlformats-officedocument.wordprocessingml.document":
+                cvs.append(extract_text_from_word(uploaded_file))
+
     candidates = rank_candidates(cv_data=cvs)
 
-    if candidates:  # Ensure proper indentation here
+    # Display candidate analysis if any CV data is available
+    if candidates:
         st.subheader("Candidates Analysis")
         for index, candidate in enumerate(candidates):
             cv, total_score, skills_score, experience_score = candidate
@@ -98,7 +114,6 @@ if uploaded_files:
 
         x = range(len(candidates))
 
-        # Create a smaller width for the figure
         fig, ax = plt.subplots(figsize=(6, 4))  # Adjust the size here
 
         ax.bar(x, skills_scores, width=0.4, label='Skills Score', color='#1f77b4', align='center')
@@ -130,9 +145,9 @@ if st.button("Clear CVs"):
     else:
         st.warning("No CVs uploaded to clear.")
 
-
 # Footer
 st.markdown("""
 ---
 *This CV analysis tool helps you evaluate your qualifications based on your CV. Ensure your CV is well-formatted and clear for the best results!*
 """)
+
